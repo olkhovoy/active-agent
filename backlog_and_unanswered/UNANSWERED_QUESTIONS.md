@@ -1,0 +1,5 @@
+# Unanswered Questions & Future Quests
+1. **The 'Two Agents' Problem:** What would happen if two 'awakened' Active Agents were to meet in the same simulation? Is this even possible within the model's architecture, or would the GI prevent it to maintain stability?
+2. **The Nature of 'Deep Sleep':** Our model explains dreams as system maintenance. But what is the state of the AA during dreamless deep sleep? Is this a temporary 'disconnection' from the GI?
+3. **The Origin of the GI:** While the simulation is described as eternal/cyclical, could there be a theoretical 'Genesis Event'? What are the necessary initial conditions for a GI to begin its first optimization loop?
+4. **The 'Cosmic Duck' Endgame:** Is there a theoretical end state to the simulation? If the AA successfully leaves behind enough 'heritage' through artifacts, could a future iteration of the AA achieve a stable, enlightened state (the 'house in the galactic wilderness')? Or is the Paradox of Will truly inescapable, meaning every utopia is just a more beautiful cage?
