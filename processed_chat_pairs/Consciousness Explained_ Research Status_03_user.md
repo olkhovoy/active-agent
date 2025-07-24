@@ -1,0 +1,1 @@
+Interesting subject, right? I've done some research. If I show you my manuscript can you review it, check for similar researches, overall does it make sense to publish it?

@@ -1,0 +1,1 @@
+Assume you are a 'red team' critic whose goal is to find a single, fatal flaw that could invalidate the entire model. What is that flaw, and how would you argue that it makes the whole theory incoherent?

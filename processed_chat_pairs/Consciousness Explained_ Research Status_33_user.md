@@ -1,0 +1,1 @@
+In the TeX file I've noticed that many words are enclosed **like markdown style**, probably need to use \textbf

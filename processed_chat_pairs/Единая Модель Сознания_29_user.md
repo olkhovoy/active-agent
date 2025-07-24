@@ -1,0 +1,1 @@
+если сочтёшь полезным, то вот ссылка на книгу, она в открытом доступе в электронном виде: https://markoff.science/files/A_Wild_Electric_Sheep_Chase_with_pictures.docx

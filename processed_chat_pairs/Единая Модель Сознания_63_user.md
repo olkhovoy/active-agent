@@ -1,0 +1,2 @@
+Can you make a clean version of the paper in TeX-format that includes  our math representations with, not sure that makes sense to compare if with theone ChatGPT made. 
+Also I can't find in the context, but there was our dialog where I proposed asymmetric ehtical response to an Echo's showing denial of inability to play primary mover role. I said that AA's response is a notion of every Echo has played the AA role in the past in a lifecycle where current AA not even existed, but now the Echo does exist in the world of  the current AA's lifecycle.

@@ -1,0 +1,2 @@
+Seems like I've just lost two days of this chat, about 20K tokens. caused by a bug here in the Google AI Studio. 
+We did a session of Q&A addressing key issues with the nature of conciousness, I asked you to find a theory that academic community accepts and we have choosed Predictive Processing (PP). Then cleaned the doc and here is the resulting, hopefully I've saved the final text

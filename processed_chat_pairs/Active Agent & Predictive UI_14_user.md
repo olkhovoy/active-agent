@@ -1,0 +1,1 @@
+I have a few special questions for you, first: Act as a critical philosopher of mind reviewing this paper. Based only on the text provided, what is the single biggest undefended assumption or logical leap the model makes? Explain your reasoning.

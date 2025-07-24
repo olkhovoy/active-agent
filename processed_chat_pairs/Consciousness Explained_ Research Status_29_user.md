@@ -1,0 +1,1 @@
+Yes, produce the final manuscript in tex and markdown and then make version in Russian 

@@ -1,0 +1,1 @@
+In simple terms, explain the relationship between the 'Active Agent' and the 'Predictive UI' as described in the paper.

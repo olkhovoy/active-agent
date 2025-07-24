@@ -1,0 +1,1 @@
+How does the paper's concept of an 'NPC' created by the learning loop differ from a typical, scripted NPC in a video game?

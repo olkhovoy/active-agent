@@ -1,0 +1,2 @@
+I've submitted the manuscript to the researchsquare.com it in the Prescreening state. Meanwhile I've got an idea. In the context of the article can you think of a demo code that an SDK or engine could be based on. I think of a game where complexity grow as player develops skill and he has to compete with itself from previous plays. Or a training app that remembers user's actions to later act without user's input for routine operations?
+

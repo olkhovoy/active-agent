@@ -1,0 +1,2 @@
+1. Progressive detalization is good as long as it lossless, so closest things have most details, but you keep possible to expand details as much as needed with proper tools. Reality suggests that most of it is perfectly folds and unfold and all glitches are explainable so  noone can exploit it and survive.
+2. There are no ultimate answers, except the one that you metioned about inifinite or cyclical process

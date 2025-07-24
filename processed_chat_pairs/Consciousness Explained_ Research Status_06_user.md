@@ -1,0 +1,2 @@
+1. It's Option B: the brain is a part of the perception that filters and preprocesses so the conciousness receives only what is needed and able to do what is enough for living a particular body that is most likely well fit to it's environment with help of continous evolution process. 
+2. The lifecycle is correct. The data that AI learning from should be the the whole set of input signals that conciousness receives filtered and preprocessed.

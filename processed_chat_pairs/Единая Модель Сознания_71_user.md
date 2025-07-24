@@ -1,0 +1,1 @@
+I think reddit is the place like no other greedy for any speculative stuff
