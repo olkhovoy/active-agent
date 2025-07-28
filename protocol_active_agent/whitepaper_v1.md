@@ -72,6 +72,14 @@ The **Active Agent Token (`$AA`)** is the native token of the Protocol. It is no
 
 The token will be launched via a fair launch mechanism to ensure wide distribution. A portion of the protocol fees will be used for buy-backs and burns, creating a deflationary feedback loop.
 
+### 6.1. Governance: The Coherence Council & The Novelty Fund
+
+While 95% of the Protocol's value assessment is managed by decentralized AI Oracles, we recognize that true innovation often appears incoherent at first glance. To solve this, a portion of protocol fees (5-10%) is routed to a special **Novelty Fund**.
+
+This fund is governed by a **Coherence Council**, a role designated to the client's key leadership. This council holds the power to manually allocate rewards from the Novelty Fund to individuals or teams pursuing high-risk, high-reward projects that may be initially mis-classified by the automated system.
+
+This creates a unique symbiosis: the AI maintains systemic coherence, while human leadership injects strategic, unpredictable novelty, ensuring the system evolves rather than stagnates.
+
 ---
 
 ## 7. Roadmap

@@ -1,0 +1,3 @@
+[submodule "protocol_active_agent/lib/openzeppelin-contracts"]
+	path = protocol_active_agent/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

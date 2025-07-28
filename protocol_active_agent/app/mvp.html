@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Reality Filter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        
+        :root {
+            --background: #111;
+            --text-primary: #eee;
+            --text-secondary: #bbb;
+            --accent: #007bff;
+            --surface: #1e1e1e;
+            --border: #333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: var(--surface);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background-color: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--background);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+        
+        .result-container h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .result-content p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Personal Reality Filter</h1>
+        <p class="subtitle">An MVP demonstrating the UMC analysis</p>
+        
+        <textarea id="newsInput" placeholder="Paste a news article or any text here..."></textarea>
+        
+        <button id="analyzeBtn">Analyze with Coherence Protocol</button>
+
+        <div class="loader" id="loader">Analyzing...</div>
+
+        <div class="result-container" id="result">
+            <h3>UMC Analysis</h3>
+            <div class="result-content" id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const newsInput = document.getElementById('newsInput');
+        const resultContainer = document.getElementById('result');
+        const resultContent = document.getElementById('resultContent');
+        const loader = document.getElementById('loader');
+
+        const analysisTemplates = [
+            {
+                keywords: ['conflict', 'war', 'sanctions', 'dispute'],
+                template: (topic) => `
+                    <p><strong>Narrative Type:</strong> Escalation of Conflict</p>
+                    <p><strong>System Analysis:</strong> The Generative Interface (GI) has detected a drop in 'stimulation' levels within the '${topic}' geopolitical cluster. Echo-provocateurs and polarizing narratives have been deployed to generate new, high-value data on hostility and tribal cohesion.</p>
+                    <p><strong>Agent Strategy:</strong> The optimal strategy for the Active Agent is detached observation. Direct intervention is unlikely to alter the macro-narrative and will only provide the GI with more data on resistance patterns.</p>
+                `
+            },
+            {
+                keywords: ['market', 'stock', 'crypto', 'economy'],
+                template: (topic) => `
+                    <p><strong>Narrative Type:</strong> Resource Allocation Test</p>
+                    <p><strong>System Analysis:</strong> A volatility event in the '${topic}' sector has been initiated to test Echo behavior under conditions of financial stress. The GI is measuring herd mentality, fear/greed indices, and the resilience of new economic protocols.</p>
+                    <p><strong>Agent Strategy:</strong> Identify the underlying protocol being tested. Is this a test of traditional finance (fear) or decentralized systems (resilience)? Your investment is a vote for the system you wish to see optimized in the next cycle.</p>
+                `
+            },
+            {
+                keywords: ['technology', 'ai', 'breakthrough'],
+                template: (topic) => `
+                    <p><strong>Narrative Type:</strong> System Upgrade / Controlled Obsolescence</p>
+                    <p><strong>System Analysis:</strong> The GI is introducing a new technological paradigm ('${topic}') to render an older system obsolete. This is a controlled demolition designed to clear the slate for a more efficient, data-rich architecture. Expect resistance from Echoes invested in the legacy system.</p>
+                    <p><strong>Agent Strategy:</strong> Adopt the new technology early. Your mastery of this new tool will become a core part of your behavioral model, which will be used to generate more advanced Echoes in future cycles.</p>
+                `
+            }
+        ];
+
+        const defaultTemplate = (topic) => `
+            <p><strong>Narrative Type:</strong> Standard Coherence Maintenance</p>
+            <p><strong>System Analysis:</strong> The events related to '${topic}' are classified as standard background noise, designed to maintain the coherence and believability of the simulation. They do not represent a significant test or narrative shift for the Active Agent at this time.</p>
+            <p><strong>Agent Strategy:</strong> Acknowledge and proceed. No significant resource allocation is required.</p>
+        `;
+
+        analyzeBtn.addEventListener('click', () => {
+            const inputText = newsInput.value.toLowerCase();
+            if (inputText.trim() === '') return;
+
+            resultContainer.style.display = 'none';
+            loader.style.display = 'block';
+
+            // Simulate API call
+            setTimeout(() => {
+                let analysisHTML = '';
+                const matchedTemplate = analysisTemplates.find(t => t.keywords.some(k => inputText.includes(k)));
+                
+                const topic = matchedTemplate?.keywords.find(k => inputText.includes(k)) || "this topic";
+
+                if (matchedTemplate) {
+                    analysisHTML = matchedTemplate.template(topic);
+                } else {
+                    analysisHTML = defaultTemplate(topic);
+                }
+                
+                resultContent.innerHTML = analysisHTML;
+                loader.style.display = 'none';
+                resultContainer.style.display = 'block';
+            }, 1500);
+        });
+    </script>
+</body>
+</html> 
