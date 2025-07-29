@@ -39,9 +39,9 @@ graph TB
     %% Blockchain Layer
     subgraph "⛓️ Blockchain Infrastructure"
         POC[Proof-of-Coherence Contract<br/>🏷️ Solidity 0.8.x]:::blockchainNode
-        AA_TOKEN[$AA Token (ERC-20)<br/>1B Fixed Supply<br/>🏷️ OpenZeppelin]:::blockchainNode
-        NFT[Deferred NFTs (ERC-1155)<br/>Vesting Rewards<br/>🏷️ 6mo/milestone unlock]:::blockchainNode
-        AA_LOYALTY[$AA-Loyalty (ERC-20)<br/>Wrapped for Retail<br/>🏷️ 10B Supply]:::blockchainNode
+        AA_TOKEN[$AA Token ERC-20<br/>1B Fixed Supply<br/>🏷️ OpenZeppelin]:::blockchainNode
+        NFT[Deferred NFTs ERC-1155<br/>Vesting Rewards<br/>🏷️ 6mo/milestone unlock]:::blockchainNode
+        AA_LOYALTY[$AA-Loyalty ERC-20<br/>Wrapped for Retail<br/>🏷️ 10B Supply]:::blockchainNode
         L2[Layer 2 Network<br/>Base/Optimism/Arbitrum<br/>🏷️ Low fees, EVM]:::blockchainNode
     end
 
