@@ -1,14 +1,14 @@
 # Coherence Protocol Ecosystem - Full Architecture
 
 ```mermaid
-graph TB
+graph LR
     %% Styling
-    classDef userNode fill:#e1f5fe,stroke:#01579b,stroke-width:3px
-    classDef aiNode fill:#f3e5f5,stroke:#4a148c,stroke-width:3px
-    classDef blockchainNode fill:#e8f5e9,stroke:#1b5e20,stroke-width:3px
-    classDef dataNode fill:#fff3e0,stroke:#e65100,stroke-width:3px
-    classDef serviceNode fill:#fce4ec,stroke:#880e4f,stroke-width:3px
-    classDef governanceNode fill:#e0f2f1,stroke:#004d40,stroke-width:3px
+    classDef userNode fill:#b3d4ff,stroke:#003366,stroke-width:2px
+    classDef aiNode fill:#e0c5ff,stroke:#4a148c,stroke-width:2px
+    classDef blockchainNode fill:#c6f6d5,stroke:#18632e,stroke-width:2px
+    classDef dataNode fill:#ffdfba,stroke:#c25b00,stroke-width:2px
+    classDef serviceNode fill:#ffd6e7,stroke:#880e4f,stroke-width:2px
+    classDef governanceNode fill:#b2f5f0,stroke:#005b55,stroke-width:2px
 
     %% Users & Actors
     subgraph "👥 Users & Actors"
