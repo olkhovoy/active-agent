@@ -18,7 +18,7 @@ Alexander Olkhovoy · Nov 2025
 - Rising **compliance cost** (+32 % YoY)
 - Siloed AI bots — no end-to-end view
 - Cultural churn → \(-1.8 pp ROE\)
-> We don’t automate tasks, we upgrade **systemic coherence**
+> We don't automate tasks, we upgrade **systemic coherence**
 
 ---
 
@@ -58,8 +58,8 @@ Alexander Olkhovoy · Nov 2025
 
 <!-- 7. AI Oracle Swarm -->
 ## LLM Oracle Swarm
-- Models: GPT-4o, Claude-3, Gemini 1.5 (on vLLM)
-- Sources: Jira · Git · Email · POS
+- Models: GPT-4o, Claude-3 Sonnet, Gemini 1.5 Pro (on vLLM)
+- Sources: Jira · Git · Email · POS · CRM
 - Metrics:
   - **Coherence Score (CS)**
   - **Stimulation Index (SI)**
@@ -74,6 +74,7 @@ Alexander Olkhovoy · Nov 2025
 | PoC contract | Solidity 0.8 | Verifies ZK-proofs |
 | $AA token | ERC-20, 1 B | Value & governance |
 | Deferred NFT | ERC-1155 | Long-term vesting |
+| $AA-L token | ERC-20, 10 B | Retail loyalty |
 | L2 network | Base / Optimism | Low fees |
 
 ---
@@ -94,6 +95,7 @@ Alexander Olkhovoy · Nov 2025
 ## Tokenomics snapshot
 - **$AA** – fixed 1 B supply
 - Distribution: 25 % treasury · 20 % GI · 15 % team · 20 % rewards · 10 % liquidity · 10 % sale
+- **$AA-L** – 10 B supply for retail loyalty
 - **Deflation:** buy-&-burn from fees
 
 ---
@@ -127,7 +129,7 @@ Alexander Olkhovoy · Nov 2025
 
 <!-- 14. Retail & SMB Extension -->
 ## Loyalty & SMB modules
-- **$AA-L** cashback token (ERC-20)
+- **$AA-L** cashback token (ERC-20, 10B supply)
 - Privacy-preserving spend scoring (ZK)
 - SMB API exposes *Market CS* for better targeting
 
@@ -160,10 +162,10 @@ Alexander Olkhovoy · Nov 2025
 ---
 
 <!-- 18. Call to Action -->
-# Upgrade your bank’s reality
+# Upgrade your bank's reality
 **Next steps**
 1. Approve 6-week pilot scope
 2. Provide data feeds (Jira, POS…)
 3. Schedule security & legal review
 
-*Let’s make coherence your competitive edge.*
+*Let's make coherence your competitive edge.*
