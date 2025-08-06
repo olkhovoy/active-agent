@@ -1,3 +1,4 @@
+
 # Banking Coherence Hub Whitepaper v1.0
 **AI-Native Layer for Culture, Compliance & Loyalty**
 

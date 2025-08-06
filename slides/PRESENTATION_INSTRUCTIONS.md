@@ -2,15 +2,16 @@
 
 ## Файлы презентации
 
-1. **`banking_coherence_hub_presentation.md`** - Основная презентация в формате Marp
-2. **`banking_coherence_hub_script_ru.md`** - Сценарий на русском языке
-3. **`banking_coherence_hub_deck.md`** - Исходная версия слайдов
+1. **`banking_coherence_hub_presentation.md`** - Основная презентация в формате Marp (английский)
+2. **`banking_coherence_hub_presentation_ru.md`** - Презентация в формате Marp (русский)
+3. **`banking_coherence_hub_script_ru.md`** - Сценарий на русском языке
+4. **`banking_coherence_hub_deck.md`** - Исходная версия слайдов
 
 ## Запуск презентации
 
 ### Вариант 1: VS Code + Marp Extension
 1. Установите расширение "Marp for VS Code"
-2. Откройте `banking_coherence_hub_presentation.md`
+2. Откройте `banking_coherence_hub_presentation.md` (английский) или `banking_coherence_hub_presentation_ru.md` (русский)
 3. Нажмите `Ctrl+Shift+P` → "Marp: Open Preview"
 4. Для показа: `Ctrl+Shift+P` → "Marp: Export Slide Deck..."
 
@@ -19,19 +20,28 @@
 # Установка Marp CLI
 npm install -g @marp-team/marp-cli
 
-# Запуск презентации
+# Запуск презентации (английский)
 marp banking_coherence_hub_presentation.md --server
 
-# Экспорт в PDF
+# Запуск презентации (русский)
+marp banking_coherence_hub_presentation_ru.md --server
+
+# Экспорт в PDF (английский)
 marp banking_coherence_hub_presentation.md --pdf
 
-# Экспорт в HTML
+# Экспорт в PDF (русский)
+marp banking_coherence_hub_presentation_ru.md --pdf
+
+# Экспорт в HTML (английский)
 marp banking_coherence_hub_presentation.md --html
+
+# Экспорт в HTML (русский)
+marp banking_coherence_hub_presentation_ru.md --html
 ```
 
 ### Вариант 3: Онлайн Marp
 1. Перейдите на https://marp.app/
-2. Загрузите файл `banking_coherence_hub_presentation.md`
+2. Загрузите файл `banking_coherence_hub_presentation.md` (английский) или `banking_coherence_hub_presentation_ru.md` (русский)
 3. Используйте встроенный просмотрщик
 
 ## Навигация по слайдам
