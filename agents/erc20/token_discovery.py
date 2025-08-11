@@ -1,23 +1,21 @@
+# -*- coding: utf-8 -*-
 import os
 import time
 import json
 import requests
-import pandas as pd
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
-from dataclasses import dataclass
-import logging
+from dataclasses import dataclass, field
 
-# Настройка логирования
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import pandas as pd
 
 @dataclass
 class TokenInfo:
-    """Структура для хранения информации о токене"""
-    name: str
-    symbol: str
+    """Структура для хранения базовой информации о токене."""
     contract_address: str
+    name: str = "Unknown"
+    symbol: str = "N/A"
     coingecko_id: Optional[str] = None
     market_cap_usd: Optional[float] = None
     volume_24h_usd: Optional[float] = None
@@ -27,315 +25,158 @@ class TokenInfo:
     launch_date: Optional[str] = None
     platform: str = "ethereum"
     discovery_method: str = "unknown"
-    risk_score: Optional[float] = None
+    source: str = "unknown" # coingecko, etherscan, etc.
 
 class TokenDiscoveryAgent:
-    """Агент для автоматического обнаружения новых ERC-20 токенов"""
-    
-    def __init__(self):
+    """
+    Агент для автоматического обнаружения новых и релевантных ERC-20 токенов.
+    """
+    def __init__(self, config: Dict):
+        self.config = config.get('discovery', {})
         self.coingecko_api_key = os.getenv('COINGECKO_API_KEY')
         self.etherscan_api_key = os.getenv('ETHERSCAN_API_KEY')
+        
         self.base_urls = {
             'coingecko': 'https://api.coingecko.com/api/v3',
             'etherscan': 'https://api.etherscan.io/api'
         }
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': 'TokenDiscoveryAgent/1.0'})
+        print("Token Discovery Agent initialized.")
+
+    async def run(self, limit: int = 20) -> List[TokenInfo]:
+        """
+        Основной метод для запуска обнаружения токенов.
+        Собирает токены из всех доступных источников и возвращает уникальный список.
+        """
+        tasks = []
+        if self.config.get('coingecko', {}).get('enabled', True):
+            tasks.append(self._discover_coingecko())
         
-    def discover_new_tokens_coingecko(self, min_market_cap: float = 1000000, 
-                                    max_age_days: int = 30) -> List[TokenInfo]:
-        """Обнаружение новых токенов через CoinGecko API"""
-        logger.info("Начинаю поиск новых токенов через CoinGecko...")
+        # TODO: Добавить Etherscan discovery
+        # if self.config.get('etherscan', {}).get('enabled', False):
+        #     tasks.append(self._discover_etherscan())
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        tokens = []
-        page = 1
-        max_pages = 10  # Ограничиваем количество страниц
+        all_tokens = []
+        for res in results:
+            if isinstance(res, list):
+                all_tokens.extend(res)
+            elif isinstance(res, Exception):
+                print(f"[Warning] Error during token discovery: {res}")
         
-        try:
-            while page <= max_pages:
-                # Получаем список токенов с пагинацией
-                url = f"{self.base_urls['coingecko']}/coins/markets"
-                params = {
-                    'vs_currency': 'usd',
-                    'order': 'market_cap_desc',
-                    'per_page': 250,
-                    'page': page,
-                    'sparkline': False,
-                    'platform': 'ethereum'
-                }
-                
-                if self.coingecko_api_key:
-                    params['x_cg_demo_api_key'] = self.coingecko_api_key
-                
-                response = self.session.get(url, params=params, timeout=30)
-                if response.status_code != 200:
-                    logger.warning(f"CoinGecko API вернул статус {response.status_code}")
-                    break
-                
-                data = response.json()
-                if not data:
-                    break
-                
-                for coin in data:
-                    # Проверяем критерии для новых токенов
-                    market_cap = coin.get('market_cap', 0)
-                    if market_cap < min_market_cap:
-                        continue
-                    
-                    # Получаем детальную информацию о токене
-                    token_detail = self._get_token_details(coin['id'])
-                    if not token_detail:
-                        continue
-                    
-                    # Проверяем возраст токена
-                    if not self._is_recent_token(token_detail, max_age_days):
-                        continue
-                    
-                    token_info = TokenInfo(
-                        name=coin['name'],
-                        symbol=coin['symbol'].upper(),
-                        contract_address=token_detail.get('contract_address', ''),
-                        coingecko_id=coin['id'],
-                        market_cap_usd=market_cap,
-                        volume_24h_usd=coin.get('total_volume', 0),
-                        price_usd=coin.get('current_price', 0),
-                        total_supply=token_detail.get('total_supply'),
-                        circulating_supply=coin.get('circulating_supply'),
-                        launch_date=token_detail.get('genesis_date'),
-                        discovery_method='coingecko_api'
-                    )
-                    
-                    tokens.append(token_info)
-                    logger.info(f"Обнаружен новый токен: {token_info.name} ({token_info.symbol})")
-                
-                page += 1
-                time.sleep(1)  # Уважаем rate limits
-                
-        except Exception as e:
-            logger.error(f"Ошибка при поиске через CoinGecko: {e}")
+        # Удаление дубликатов
+        unique_tokens = self._remove_duplicates(all_tokens)
         
-        logger.info(f"Обнаружено {len(tokens)} новых токенов через CoinGecko")
-        return tokens
-    
-    def discover_tokens_etherscan(self, min_holders: int = 100, 
-                                min_transactions: int = 1000) -> List[TokenInfo]:
-        """Обнаружение токенов через сканирование Ethereum блокчейна"""
-        logger.info("Начинаю сканирование Ethereum блокчейна...")
-        
-        if not self.etherscan_api_key:
-            logger.warning("Etherscan API ключ не найден, пропускаю сканирование блокчейна")
-            return []
-        
-        tokens = []
+        # Возвращаем запрошенное количество токенов
+        return unique_tokens[:limit]
+
+    async def _discover_coingecko(self) -> List[TokenInfo]:
+        """Обнаружение токенов через CoinGecko API."""
+        print("Discovering tokens via CoinGecko...")
+        loop = asyncio.get_event_loop()
         
         try:
-            # Получаем последние блоки и ищем токен-транзакции
-            latest_block_url = f"{self.base_urls['etherscan']}"
-            params = {
-                'module': 'proxy',
-                'action': 'eth_blockNumber',
-                'apikey': self.etherscan_api_key
-            }
-            
-            response = self.session.get(latest_block_url, params=params, timeout=30)
-            if response.status_code != 200:
-                logger.warning(f"Etherscan API вернул статус {response.status_code}")
-                return tokens
-            
-            data = response.json()
-            if data.get('status') != '1':
-                return tokens
-            
-            # Сканируем последние 100 блоков на предмет токен-транзакций
-            latest_block = int(data['result'], 16)
-            start_block = max(0, latest_block - 100)
-            
-            for block_num in range(start_block, latest_block + 1):
-                block_params = {
-                    'module': 'proxy',
-                    'action': 'eth_getBlockByNumber',
-                    'tag': hex(block_num),
-                    'boolean': 'true',
-                    'apikey': self.etherscan_api_key
-                }
-                
-                block_response = self.session.get(latest_block_url, params=block_params, timeout=30)
-                if block_response.status_code != 200:
-                    continue
-                
-                block_data = block_response.json()
-                if not block_data.get('result'):
-                    continue
-                
-                # Анализируем транзакции в блоке
-                for tx in block_data['result'].get('transactions', []):
-                    if self._is_token_transaction(tx):
-                        token_info = self._extract_token_from_transaction(tx)
-                        if token_info and self._meets_criteria(token_info, min_holders, min_transactions):
-                            tokens.append(token_info)
-                            logger.info(f"Обнаружен токен в блоке: {token_info.name} ({token_info.symbol})")
-                
-                time.sleep(0.1)  # Уважаем rate limits
-                
-        except Exception as e:
-            logger.error(f"Ошибка при сканировании блокчейна: {e}")
-        
-        logger.info(f"Обнаружено {len(tokens)} токенов через сканирование блокчейна")
-        return tokens
-    
-    def _get_token_details(self, coin_id: str) -> Optional[Dict]:
-        """Получение детальной информации о токене"""
-        try:
-            url = f"{self.base_urls['coingecko']}/coins/{coin_id}"
-            params = {}
-            if self.coingecko_api_key:
-                params['x_cg_demo_api_key'] = self.coingecko_api_key
-            
-            response = self.session.get(url, params=params, timeout=30)
-            if response.status_code == 200:
-                return response.json()
-        except Exception as e:
-            logger.debug(f"Не удалось получить детали для {coin_id}: {e}")
-        return None
-    
-    def _is_recent_token(self, token_detail: Dict, max_age_days: int) -> bool:
-        """Проверка, является ли токен недавно созданным"""
-        genesis_date = token_detail.get('genesis_date')
-        if not genesis_date:
-            return False
-        
-        try:
-            launch_date = datetime.strptime(genesis_date, '%Y-%m-%d')
-            age_days = (datetime.now() - launch_date).days
-            return age_days <= max_age_days
-        except ValueError:
-            return False
-    
-    def _is_token_transaction(self, tx: Dict) -> bool:
-        """Проверка, является ли транзакция токен-транзакцией"""
-        # Проверяем на ERC-20 transfer события
-        input_data = tx.get('input', '')
-        return input_data.startswith('0xa9059cbb')  # transfer(address,uint256) signature
-    
-    def _extract_token_from_transaction(self, tx: Dict) -> Optional[TokenInfo]:
-        """Извлечение информации о токене из транзакции"""
-        try:
-            # Получаем информацию о контракте токена
-            contract_address = tx.get('to', '')
-            if not contract_address:
-                return None
-            
-            # Получаем базовую информацию о токене
-            token_info = self._get_erc20_info(contract_address)
-            if token_info:
-                token_info.discovery_method = 'blockchain_scan'
-                return token_info
-                
-        except Exception as e:
-            logger.debug(f"Не удалось извлечь информацию о токене: {e}")
-        
-        return None
-    
-    def _get_erc20_info(self, contract_address: str) -> Optional[TokenInfo]:
-        """Получение базовой информации о ERC-20 токене"""
-        try:
-            # Получаем имя, символ и общее предложение токена
-            params = {
-                'module': 'contract',
-                'action': 'getabi',
-                'address': contract_address,
-                'apikey': self.etherscan_api_key
-            }
-            
-            response = self.session.get(self.base_urls['etherscan'], params=params, timeout=30)
-            if response.status_code != 200:
-                return None
-            
-            data = response.json()
-            if data.get('status') != '1':
-                return None
-            
-            # Здесь можно добавить более детальный анализ ABI
-            # Пока возвращаем базовую информацию
-            return TokenInfo(
-                name=f"Token_{contract_address[:8]}",
-                symbol="UNKNOWN",
-                contract_address=contract_address
+            # Используем run_in_executor для выполнения синхронного кода в async
+            response = await loop.run_in_executor(
+                None, 
+                self._fetch_coingecko_market_data
             )
             
-        except Exception as e:
-            logger.debug(f"Не удалось получить ERC-20 информацию: {e}")
-            return None
-    
-    def _meets_criteria(self, token: TokenInfo, min_holders: int, min_transactions: int) -> bool:
-        """Проверка соответствия токена критериям"""
-        # Здесь можно добавить более сложную логику проверки
-        return True
-    
-    def save_discovered_tokens(self, tokens: List[TokenInfo], filename: str = None):
-        """Сохранение обнаруженных токенов в CSV файл"""
-        if not filename:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"discovered_tokens_{timestamp}.csv"
-        
-        # Конвертируем в DataFrame
-        data = []
-        for token in tokens:
-            data.append({
-                'name': token.name,
-                'symbol': token.symbol,
-                'contract_address': token.contract_address,
-                'coingecko_id': token.coingecko_id,
-                'market_cap_usd': token.market_cap_usd,
-                'volume_24h_usd': token.volume_24h_usd,
-                'price_usd': token.price_usd,
-                'total_supply': token.total_supply,
-                'circulating_supply': token.circulating_supply,
-                'launch_date': token.launch_date,
-                'platform': token.platform,
-                'discovery_method': token.discovery_method,
-                'risk_score': token.risk_score
-            })
-        
-        df = pd.DataFrame(data)
-        df.to_csv(filename, index=False)
-        logger.info(f"Сохранено {len(tokens)} токенов в {filename}")
-        return filename
+            if not response:
+                return []
+                
+            tokens = [
+                TokenInfo(
+                    contract_address=t.get('platforms', {}).get('ethereum', ''),
+                    name=t.get('name'),
+                    symbol=t.get('symbol').upper(),
+                    coingecko_id=t.get('id'),
+                    market_cap_usd=t.get('market_cap'),
+                    volume_24h_usd=t.get('total_volume'),
+                    price_usd=t.get('current_price'),
+                    circulating_supply=t.get('circulating_supply'),
+                    total_supply=t.get('total_supply'),
+                    source='coingecko'
+                )
+                for t in response 
+                if t.get('platforms', {}).get('ethereum')
+            ]
+            print(f"Discovered {len(tokens)} tokens from CoinGecko.")
+            return tokens
 
-def main():
-    """Основная функция для тестирования агента обнаружения"""
-    discovery_agent = TokenDiscoveryAgent()
+        except Exception as e:
+            print(f"[Error] Failed to discover tokens from CoinGecko: {e}")
+            return []
+
+    def _fetch_coingecko_market_data(self) -> Optional[List[Dict]]:
+        """Синхронный метод для запроса данных с CoinGecko."""
+        url = f"{self.base_urls['coingecko']}/coins/markets"
+        params = {
+            'vs_currency': 'usd',
+            'category': 'ethereum-ecosystem',
+            'order': 'market_cap_desc',
+            'per_page': self.config.get('coingecko',{}).get('max_tokens_per_request', 100),
+            'page': 1,
+            'sparkline': 'false',
+            'locale': 'en',
+            'x_cg_demo_api_key': self.coingecko_api_key
+        }
+        try:
+            res = self.session.get(url, params=params)
+            res.raise_for_status()
+            return res.json()
+        except requests.exceptions.RequestException as e:
+            print(f"[Error] CoinGecko API request failed: {e}")
+            return None
+
+    def _remove_duplicates(self, tokens: List[TokenInfo]) -> List[TokenInfo]:
+        """Удаляет дубликаты токенов по адресу контракта."""
+        seen = set()
+        unique_tokens = []
+        for token in tokens:
+            # Пропускаем токены без адреса контракта
+            if not token.contract_address or not isinstance(token.contract_address, str):
+                continue
+                
+            addr_lower = token.contract_address.lower()
+            if addr_lower not in seen:
+                seen.add(addr_lower)
+                unique_tokens.append(token)
+        return unique_tokens
+
+    async def _discover_etherscan(self) -> List[TokenInfo]:
+        """
+        (Placeholder) Обнаружение токенов через сканирование блоков Etherscan.
+        """
+        print("Etherscan discovery is not yet implemented.")
+        # Здесь будет логика сканирования последних блоков на предмет
+        # создания новых контрактов, которые могут быть ERC-20 токенами.
+        await asyncio.sleep(0) # для асинхронности
+        return []
+
+# Пример использования
+async def main():
+    print("--- Running Token Discovery Agent Standalone ---")
     
-    # Обнаружение через CoinGecko
-    coingecko_tokens = discovery_agent.discover_new_tokens_coingecko(
-        min_market_cap=1000000,  # Минимум $1M market cap
-        max_age_days=30          # Токены не старше 30 дней
-    )
+    # Загружаем мок-конфигурацию, т.к. orchestrator не запущен
+    config = {
+        'discovery': {
+            'coingecko': { 'enabled': True, 'max_tokens_per_request': 50 },
+            'etherscan': { 'enabled': False }
+        }
+    }
     
-    # Обнаружение через сканирование блокчейна
-    blockchain_tokens = discovery_agent.discover_tokens_etherscan(
-        min_holders=100,         # Минимум 100 держателей
-        min_transactions=1000    # Минимум 1000 транзакций
-    )
+    agent = TokenDiscoveryAgent(config)
+    tokens = await agent.run(limit=10)
     
-    # Объединяем результаты
-    all_tokens = coingecko_tokens + blockchain_tokens
-    
-    # Убираем дубликаты по адресу контракта
-    unique_tokens = {}
-    for token in all_tokens:
-        if token.contract_address not in unique_tokens:
-            unique_tokens[token.contract_address] = token
-    
-    final_tokens = list(unique_tokens.values())
-    
-    # Сохраняем результаты
-    if final_tokens:
-        filename = discovery_agent.save_discovered_tokens(final_tokens)
-        print(f"Обнаружено {len(final_tokens)} уникальных токенов")
-        print(f"Результаты сохранены в {filename}")
+    if tokens:
+        print("\n--- Discovered Tokens ---")
+        for token in tokens:
+            print(f"- {token.name} ({token.symbol}): MC ${token.market_cap_usd:,.0f}")
     else:
-        print("Токены не обнаружены")
+        print("\nNo tokens discovered.")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

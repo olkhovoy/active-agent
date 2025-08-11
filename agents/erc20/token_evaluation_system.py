@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 # Импорт наших агентов
-from token_discovery_agent import TokenDiscoveryAgent, TokenInfo
+from token_discovery import TokenDiscoveryAgent, TokenInfo
 from advanced_evaluator import AdvancedTokenEvaluator, TokenAssessment
 from token_monitor import TokenMonitor, TokenIndex, TokenEvent
 

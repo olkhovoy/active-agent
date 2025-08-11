@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 import logging
 from web3 import Web3
-from eth_abi import decode_abi
+from eth_abi import decode
 import hashlib
 
 # Настройка логирования
@@ -28,6 +28,14 @@ class SecurityMetrics:
     has_pause_function: bool = False
     owner_privileges: int = 0  # Количество привилегированных функций
     risk_score: float = 0.0
+    red_flags: List[str] = None
+    green_flags: List[str] = None
+    
+    def __post_init__(self):
+        if self.red_flags is None:
+            self.red_flags = []
+        if self.green_flags is None:
+            self.green_flags = []
 
 @dataclass
 class LiquidityMetrics:
