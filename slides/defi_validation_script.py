@@ -11,14 +11,17 @@ from datetime import datetime, timedelta
 import json
 import time
 from typing import Dict, List, Tuple
+import os
 
 class DeFiCoherenceAnalyzer:
     def __init__(self, github_token: str = None, etherscan_api_key: str = None):
-        self.github_token = github_token
-        self.etherscan_api_key = etherscan_api_key
-        self.headers = {}
-        if github_token:
-            self.headers['Authorization'] = f'token {github_token}'
+        self.github_token = github_token or os.getenv('GITHUB_TOKEN')
+        self.etherscan_api_key = etherscan_api_key or os.getenv('ETHERSCAN_API_KEY')
+        self.headers = {
+            'Accept': 'application/vnd.github+json'
+        }
+        if self.github_token:
+            self.headers['Authorization'] = f'token {self.github_token}'
         
         # Успешные DeFi проекты
         self.successful_projects = {
@@ -72,7 +75,7 @@ class DeFiCoherenceAnalyzer:
         releases_url = f"{repo_url}/releases"
         releases = self._get_paginated_data(releases_url, months_back)
         
-        # Security advisories
+        # Security advisories (может требовать прав/превью; обрабатываем мягко)
         security_url = f"{repo_url}/security-advisories"
         security = self._get_paginated_data(security_url, months_back)
         
@@ -116,38 +119,64 @@ class DeFiCoherenceAnalyzer:
         
         return defi_data.get(project_name, {'tvl': 0, 'volume_24h': 0, 'users': 0})
     
+    def _parse_item_datetime(self, item: Dict) -> datetime:
+        """Нормализованное извлечение даты для разных типов объектов GitHub."""
+        dt_str = None
+        if isinstance(item, dict):
+            if 'created_at' in item and item['created_at']:
+                dt_str = item['created_at']
+            elif 'commit' in item and item.get('commit', {}).get('author', {}).get('date'):
+                dt_str = item['commit']['author']['date']
+            elif 'published_at' in item and item['published_at']:
+                dt_str = item['published_at']
+            elif 'updated_at' in item and item['updated_at']:
+                dt_str = item['updated_at']
+        if not dt_str:
+            return None
+        # Приводим к ISO с часовым поясом
+        try:
+            return datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
+        except Exception:
+            return None
+
     def _get_paginated_data(self, url: str, months_back: int) -> List[Dict]:
-        """Получить пагинированные данные с ограничением по времени"""
-        data = []
+        """Получить пагинированные данные с ограничением по времени (робастно по типам дат)."""
+        data: List[Dict] = []
         page = 1
-        cutoff_date = datetime.now() - timedelta(days=months_back * 30)
+        cutoff_date = datetime.now().astimezone() - timedelta(days=months_back * 30)
         
         while True:
             params = {'page': page, 'per_page': 100}
+            # Для issues/pulls берем все состояния, сортировка по созданию
+            if url.endswith('/issues') or url.endswith('/pulls'):
+                params.update({'state': 'all', 'sort': 'created', 'direction': 'desc'})
             response = requests.get(url, headers=self.headers, params=params)
             
             if response.status_code != 200:
+                # Мягкая деградация: возвращаем то, что уже собрали
                 break
                 
             page_data = response.json()
             if not page_data:
                 break
             
-            # Фильтруем по дате
             filtered_data = []
             for item in page_data:
-                item_date = datetime.fromisoformat(item['created_at'].replace('Z', '+00:00'))
+                item_date = self._parse_item_datetime(item)
+                if item_date is None:
+                    continue
                 if item_date >= cutoff_date:
                     filtered_data.append(item)
                 else:
-                    break
+                    # Дальнейшие элементы на этой странице, вероятно, ещё старше
+                    continue
             
             data.extend(filtered_data)
             
-            # Если нашли старые данные, останавливаемся
-            if len(filtered_data) < len(page_data):
+            # Если мало актуальных данных или достигли конца, завершаем
+            if len(page_data) < 100 or len(filtered_data) == 0:
                 break
-                
+            
             page += 1
             time.sleep(0.1)  # Rate limiting
         
@@ -163,8 +192,10 @@ class DeFiCoherenceAnalyzer:
             return 0.0
         
         # Анализ регулярности коммитов
-        commit_dates = [datetime.fromisoformat(c['commit']['author']['date'].replace('Z', '+00:00')) 
-                       for c in commits]
+        commit_dates = [self._parse_item_datetime(c) for c in commits]
+        commit_dates = [d for d in commit_dates if d is not None]
+        if not commit_dates:
+            return 0.0
         commit_dates.sort()
         
         # Рассчитываем интервалы между коммитами
@@ -184,11 +215,16 @@ class DeFiCoherenceAnalyzer:
         # Время ответа на issues
         issue_response_times = []
         for issue in issues:
-            if issue.get('closed_at'):
-                created = datetime.fromisoformat(issue['created_at'].replace('Z', '+00:00'))
-                closed = datetime.fromisoformat(issue['closed_at'].replace('Z', '+00:00'))
-                response_time = (closed - created).total_seconds() / 3600  # часы
-                issue_response_times.append(response_time)
+            created_raw = issue.get('created_at')
+            closed_raw = issue.get('closed_at')
+            if created_raw and closed_raw:
+                try:
+                    created = datetime.fromisoformat(created_raw.replace('Z', '+00:00'))
+                    closed = datetime.fromisoformat(closed_raw.replace('Z', '+00:00'))
+                    response_time = (closed - created).total_seconds() / 3600  # часы
+                    issue_response_times.append(response_time)
+                except Exception:
+                    continue
         
         if issue_response_times:
             avg_response_time = np.mean(issue_response_times)
@@ -213,7 +249,13 @@ class DeFiCoherenceAnalyzer:
             return 0.0
         
         # Анализ новизны коммитов
-        commit_messages = [c['commit']['message'] for c in commits]
+        commit_messages = []
+        for c in commits:
+            msg = c.get('commit', {}).get('message') if isinstance(c, dict) else None
+            if msg:
+                commit_messages.append(msg)
+        if not commit_messages:
+            return 0.0
         
         # Подсчет DeFi-специфичных инновационных паттернов
         defi_innovation_keywords = [
@@ -225,12 +267,12 @@ class DeFiCoherenceAnalyzer:
         innovation_count = sum(1 for msg in commit_messages 
                              if any(keyword in msg.lower() for keyword in defi_innovation_keywords))
         
-        innovation_score = min(innovation_count / len(commit_messages), 1.0)
+        innovation_score = min(innovation_count / max(len(commit_messages), 1), 1.0)
         
         # Релевантность описания для DeFi
         defi_relevance_keywords = ['defi', 'decentralized', 'finance', 'protocol', 'amm', 'lending', 'yield']
         description_relevance = sum(1 for keyword in defi_relevance_keywords 
-                                  if keyword in description.lower()) / len(defi_relevance_keywords)
+                                  if keyword in (description or '').lower()) / max(len(defi_relevance_keywords), 1)
         
         # Объем транзакций как показатель активности
         volume_score = min(defi_data.get('volume_24h', 0) / 100000000, 1.0)  # Нормализуем к 100M
@@ -246,13 +288,14 @@ class DeFiCoherenceAnalyzer:
             return 0.0
         
         # Консистентность разработки
-        commit_dates = [datetime.fromisoformat(c['commit']['author']['date'].replace('Z', '+00:00')) 
-                       for c in commits]
+        commit_dates = [self._parse_item_datetime(c) for c in commits]
+        commit_dates = [d for d in commit_dates if d is not None]
+        if not commit_dates:
+            return 0.0
         commit_dates.sort()
         
-        # Рассчитываем равномерность распределения коммитов
         total_days = (commit_dates[-1] - commit_dates[0]).days
-        if total_days == 0:
+        if total_days <= 0:
             return 0.0
         
         commits_per_day = len(commits) / total_days
@@ -344,7 +387,7 @@ class DeFiCoherenceAnalyzer:
 
 ## Корреляция CS с успехом:
 - Разделяющая линия: CS = 60
-- Точность предсказания: {(len(successful[successful['coherence_score'] > 60]) + len(failed[failed['coherence_score'] <= 60])) / len(df) * 100:.1f}%
+- Точность предсказания: {(len(successful[successful['coherence_score'] > 60]) + len(failed[failed['coherence_score'] <= 60])) / max(len(df),1) * 100:.1f}%
 
 ## Детальный анализ компонентов:
 {df.groupby('category')[['coherence_reduction', 'stimulation_contribution', 'temporal_alignment']].mean().round(1)}
@@ -383,7 +426,10 @@ def main():
     
     # Показываем краткие результаты
     print("\nКраткие результаты:")
-    print(results_df[['project', 'category', 'coherence_score', 'tvl']].round(1))
+    if not results_df.empty:
+        print(results_df[['project', 'category', 'coherence_score', 'tvl']].round(1))
+    else:
+        print("Нет данных (возможен rate limit GitHub или недоступные репозитории)")
 
 if __name__ == "__main__":
     main() 

@@ -1,0 +1,11 @@
+project,repo,category,coherence_score,tvl,volume_24h,users,coherence_reduction,stimulation_contribution,temporal_alignment
+Uniswap,Uniswap/uniswap-v3-core,successful,0.0,3200000000,500000000,500000,0.0,0.0,0.0
+Aave,aave/aave-v3-core,successful,11.428571428571427,6800000000,200000000,300000,0.0,38.095238095238095,0.0
+Compound,compound-finance/compound-protocol,successful,0.0,2100000000,100000000,200000,0.0,0.0,0.0
+MakerDAO,makerdao/dss,successful,0.0,5400000000,150000000,250000,0.0,0.0,0.0
+Curve Finance,curvefi/curve-contract,successful,69.99598321878068,2800000000,300000000,150000,99.99330536463447,33.33333333333333,0.0
+Synthetix,Synthetixio/synthetix,successful,43.24921321128641,400000000,50000000,80000,55.07751342524979,20.58823529411765,40.26234567901235
+Yearn Finance,yearn/yearn-vaults,successful,0.0,800000000,30000000,60000,0.0,0.0,0.0
+Balancer,balancer-labs/balancer-v2-monorepo,successful,33.58295159445477,200000000,20000000,40000,45.60782937700134,15.925925925925927,14.404761904761907
+Terra/LUNA,terra-money/core,failed,0.0,0,0,0,0.0,0.0,0.0
+Anchor Protocol,anchor-protocol/anchor,failed,0.0,0,0,0,0.0,0.0,0.0
