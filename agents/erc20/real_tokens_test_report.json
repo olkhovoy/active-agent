@@ -1,0 +1,41 @@
+{
+  "test_date": "2025-08-11T10:52:05.585636",
+  "total_tokens_tested": 20,
+  "evaluation_results": [
+    {
+      "token": "USDT",
+      "assessment": "TokenAssessment(contract_address='0xdAC17F958D2ee523a2206206994597C13D831ec7', name='USDT', symbol='USDT', overall_score=0, security_score=0.0, liquidity_score=0, community_score=0, risk_level='CRITICAL', recommendation='AVOID', security_metrics=SecurityMetrics(has_verified_source=False, has_audit_report=False, has_multisig_wallet=False, has_timelock=False, has_blacklist_function=False, has_mint_function=False, has_pause_function=False, owner_privileges=0, risk_score=0.0, red_flags=['Не удалось получить ABI контракта'], green_flags=[]), liquidity_metrics=LiquidityMetrics(total_liquidity_usd=0.0, liquidity_distribution=None, liquidity_concentration=0.0, slippage_impact=0.1), community_metrics=CommunityMetrics(github_activity=0.0, social_media_presence=0.4, community_size=0, developer_activity=0.0, documentation_quality=0.6), red_flags=[], green_flags=[], assessment_date='2025-08-11T10:52:05.585430')",
+      "success": true
+    },
+    {
+      "token": "USDC",
+      "assessment": "TokenAssessment(contract_address='0xA0b86a33E6441b8c4C8C8C8C8C8C8C8C8C8C8C8', name='USDC', symbol='USDC', overall_score=0, security_score=0.0, liquidity_score=0, community_score=0, risk_level='CRITICAL', recommendation='AVOID', security_metrics=SecurityMetrics(has_verified_source=False, has_audit_report=False, has_multisig_wallet=False, has_timelock=False, has_blacklist_function=False, has_mint_function=False, has_pause_function=False, owner_privileges=0, risk_score=0.0, red_flags=['Не удалось получить ABI контракта'], green_flags=[]), liquidity_metrics=LiquidityMetrics(total_liquidity_usd=0.0, liquidity_distribution=None, liquidity_concentration=0.0, slippage_impact=0.1), community_metrics=CommunityMetrics(github_activity=0.0, social_media_presence=0.4, community_size=0, developer_activity=0.0, documentation_quality=0.6), red_flags=[], green_flags=[], assessment_date='2025-08-11T10:52:05.585481')",
+      "success": true
+    },
+    {
+      "token": "UNI",
+      "assessment": "TokenAssessment(contract_address='0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', name='Uniswap', symbol='UNI', overall_score=0, security_score=0.0, liquidity_score=0, community_score=0, risk_level='CRITICAL', recommendation='AVOID', security_metrics=SecurityMetrics(has_verified_source=False, has_audit_report=False, has_multisig_wallet=False, has_timelock=False, has_blacklist_function=False, has_mint_function=False, has_pause_function=False, owner_privileges=0, risk_score=0.0, red_flags=['Не удалось получить ABI контракта'], green_flags=[]), liquidity_metrics=LiquidityMetrics(total_liquidity_usd=0.0, liquidity_distribution=None, liquidity_concentration=0.0, slippage_impact=0.1), community_metrics=CommunityMetrics(github_activity=0.0, social_media_presence=0.4, community_size=0, developer_activity=0.0, documentation_quality=0.6), red_flags=[], green_flags=[], assessment_date='2025-08-11T10:52:05.585522')",
+      "success": true
+    },
+    {
+      "token": "LINK",
+      "assessment": "TokenAssessment(contract_address='0x514910771AF9Ca656af840dff83E8264EcF986CA', name='Chainlink', symbol='LINK', overall_score=0, security_score=0.0, liquidity_score=0, community_score=0, risk_level='CRITICAL', recommendation='AVOID', security_metrics=SecurityMetrics(has_verified_source=False, has_audit_report=False, has_multisig_wallet=False, has_timelock=False, has_blacklist_function=False, has_mint_function=False, has_pause_function=False, owner_privileges=0, risk_score=0.0, red_flags=['Не удалось получить ABI контракта'], green_flags=[]), liquidity_metrics=LiquidityMetrics(total_liquidity_usd=0.0, liquidity_distribution=None, liquidity_concentration=0.0, slippage_impact=0.1), community_metrics=CommunityMetrics(github_activity=0.0, social_media_presence=0.4, community_size=0, developer_activity=0.0, documentation_quality=0.6), red_flags=[], green_flags=[], assessment_date='2025-08-11T10:52:05.585559')",
+      "success": true
+    },
+    {
+      "token": "AAVE",
+      "assessment": "TokenAssessment(contract_address='0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', name='Aave', symbol='AAVE', overall_score=0, security_score=0.0, liquidity_score=0, community_score=0, risk_level='CRITICAL', recommendation='AVOID', security_metrics=SecurityMetrics(has_verified_source=False, has_audit_report=False, has_multisig_wallet=False, has_timelock=False, has_blacklist_function=False, has_mint_function=False, has_pause_function=False, owner_privileges=0, risk_score=0.0, red_flags=['Не удалось получить ABI контракта'], green_flags=[]), liquidity_metrics=LiquidityMetrics(total_liquidity_usd=0.0, liquidity_distribution=None, liquidity_concentration=0.0, slippage_impact=0.1), community_metrics=CommunityMetrics(github_activity=0.0, social_media_presence=0.4, community_size=0, developer_activity=0.0, documentation_quality=0.6), red_flags=[], green_flags=[], assessment_date='2025-08-11T10:52:05.585596')",
+      "success": true
+    }
+  ],
+  "summary": {
+    "successful_evaluations": 5,
+    "failed_evaluations": 0,
+    "tokens_by_risk": {
+      "CRITICAL": 5
+    },
+    "recommendations": {
+      "AVOID": 5
+    }
+  }
+}

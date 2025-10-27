@@ -1,0 +1,13 @@
+model_backend: vllm  # options: vllm | llama_cpp
+llm_model: models/Qwen2.5-7B-Instruct  # for vLLM (HF dir)
+llama_gguf: models/Qwen2.5-14B-Instruct-Q4_K_M.gguf  # for llama.cpp
+embedding_model: BAAI/bge-m3
+qdrant:
+  url: http://localhost:6333
+  collection: umc_projects
+retrieval:
+  top_k: 8
+  max_doc_len: 2000
+scoring:
+  coherence_weights: {semantic: 0.35, delivery: 0.25, repo: 0.20, onchain: 0.20}
+  stimulation_weights: {engagement: 0.40, market: 0.25, novelty: 0.20, spread: 0.15}

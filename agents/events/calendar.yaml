@@ -1,0 +1,54 @@
+# Events calendar schema
+# - id: unique string
+#   project: name aligned with batch results (e.g., Uniswap, Aave)
+#   date: ISO date (YYYY-MM-DD)
+#   type: listing | airdrop | release | governance | integration | other
+#   title: short title
+#   details: optional longer description
+#   source: optional URL or note
+#   status: planned | tentative | confirmed
+
+- id: uni-2025-08-release-rc
+  project: Uniswap
+  date: 2025-08-15
+  type: release
+  title: Protocol maintenance release (tentative)
+  details: Repository indicates active maintenance; minor release forecast within August window.
+  source: GitHub activity snapshot
+  status: tentative
+
+- id: aave-2025-08-governance
+  project: Aave
+  date: 2025-08-18
+  type: governance
+  title: Governance proposal voting window
+  details: Periodic proposal cycle; monitor forum for agenda.
+  source: Aave governance forum
+  status: tentative
+
+- id: maker-2025-08-risk-update
+  project: MakerDAO
+  date: 2025-08-20
+  type: governance
+  title: Risk parameter update window
+  details: Routine adjustments possible; watch MIPs calendar.
+  source: MIPs schedule
+  status: tentative
+
+- id: curve-2025-08-integration
+  project: Curve
+  date: 2025-08-22
+  type: integration
+  title: Pool parameter update / new gauge (watchlist)
+  details: Based on recurring cadence; confirm via CRV governance.
+  source: Curve governance
+  status: tentative
+
+- id: snx-2025-08-release
+  project: Synthetix
+  date: 2025-08-25
+  type: release
+  title: Contracts update (minor)
+  details: Dev activity suggests incremental update window.
+  source: GitHub releases/issues
+  status: tentative

@@ -1,0 +1,211 @@
+# Конфигурация системы оценки ERC-20 токенов
+
+# Настройки базы данных
+database:
+  path: "token_evaluation.db"
+  backup_enabled: true
+  backup_interval_hours: 24
+  max_backup_files: 7
+
+# Настройки обнаружения токенов
+discovery:
+  # CoinGecko API
+  coingecko:
+    enabled: true
+    rate_limit_delay: 1.0  # секунды между запросами
+    max_tokens_per_request: 250
+  
+  # Etherscan API
+  etherscan:
+    enabled: true
+    rate_limit_delay: 0.2  # секунды между запросами
+    max_blocks_per_scan: 1000
+  
+  # Критерии фильтрации
+  filters:
+    min_market_cap_usd: 1000000  # $1M
+    max_age_days: 30
+    min_holders: 100
+    min_transactions: 1000
+    min_liquidity_usd: 100000    # $100K
+
+# Настройки оценки токенов
+evaluation:
+  # Веса для различных метрик
+  weights:
+    security: 0.4
+    liquidity: 0.3
+    community: 0.3
+  
+  # Пороговые значения для классификации риска
+  risk_thresholds:
+    critical: 0.8
+    high: 0.6
+    medium: 0.4
+    low: 0.2
+  
+  # Настройки LLM-оценки
+  llm:
+    enabled: true
+    model: "gpt-4"  # или другой доступный модель
+    max_tokens: 1000
+    temperature: 0.1
+
+# Настройки мониторинга
+monitoring:
+  # Интервалы обновления
+  update_intervals:
+    new_tokens_minutes: 30
+    liquidity_minutes: 15
+    metrics_minutes: 60
+    cleanup_days: 7
+  
+  # Сканирование блоков
+  block_scanning:
+    enabled: true
+    block_interval: 100
+    max_blocks_per_scan: 1000
+    retry_attempts: 3
+  
+  # Уведомления
+  notifications:
+    enabled: false
+    high_risk_alerts: true
+    new_token_alerts: true
+    scam_detection_alerts: true
+
+# Настройки безопасности
+security:
+  # Проверка контрактов
+  contract_verification:
+    required: true
+    check_source_code: true
+    check_audit_reports: true
+  
+  # Функции-индикаторы риска
+  risk_functions:
+    mint_function: true
+    pause_function: true
+    blacklist_function: true
+    owner_privileges: true
+  
+  # Мультисиг и таймлок
+  advanced_security:
+    check_multisig: true
+    check_timelock: true
+    min_multisig_signers: 3
+    min_timelock_hours: 24
+
+# Настройки ликвидности
+liquidity:
+  # Минимальные требования
+  minimums:
+    total_liquidity_usd: 100000
+    dex_count: 2
+    holder_distribution: 0.1  # Максимальная доля у топ-10 держателей
+  
+  # Анализ DEX
+  dex_analysis:
+    supported_dexes:
+      - "uniswap_v2"
+      - "uniswap_v3"
+      - "sushiswap"
+      - "balancer"
+      - "curve"
+    min_liquidity_per_dex: 50000
+
+# Настройки сообщества
+community:
+  # GitHub анализ
+  github:
+    enabled: true
+    min_stars: 10
+    min_forks: 5
+    min_contributors: 3
+    activity_window_days: 90
+  
+  # Социальные сети
+  social_media:
+    enabled: true
+    platforms:
+      - "twitter"
+      - "telegram"
+      - "discord"
+      - "reddit"
+    min_followers: 1000
+  
+  # Документация
+  documentation:
+    required: true
+    check_whitepaper: true
+    check_roadmap: true
+    check_audit_reports: true
+
+# Настройки экспорта и отчетов
+export:
+  formats:
+    - "csv"
+    - "json"
+    - "excel"
+  
+  # Автоматический экспорт
+  auto_export:
+    enabled: true
+    interval_hours: 24
+    output_directory: "token_evaluation_export"
+  
+  # Отчеты
+  reports:
+    daily_summary: true
+    weekly_analysis: true
+    monthly_trends: true
+    risk_alerts: true
+
+# Настройки логирования
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_logging: true
+  log_file: "token_evaluation.log"
+  max_log_size_mb: 100
+  log_retention_days: 30
+  
+  # Детализация
+  detailed_logging:
+    api_calls: true
+    token_discovery: true
+    evaluation_steps: true
+    risk_detection: true
+
+# Настройки производительности
+performance:
+  # Асинхронные операции
+  async:
+    max_concurrent_requests: 10
+    request_timeout: 30
+    retry_delay: 5
+  
+  # Кэширование
+  caching:
+    enabled: true
+    cache_ttl_hours: 24
+    max_cache_size_mb: 100
+  
+  # Ограничения API
+  rate_limiting:
+    coingecko_requests_per_minute: 50
+    etherscan_requests_per_second: 5
+    infura_requests_per_second: 10
+
+# Настройки тестирования
+testing:
+  # Тестовые данные
+  test_data:
+    enabled: false
+    mock_api_responses: true
+    sample_tokens_file: "test_tokens.json"
+  
+  # Валидация
+  validation:
+    check_contract_addresses: true
+    validate_token_data: true
+    test_evaluation_logic: true
